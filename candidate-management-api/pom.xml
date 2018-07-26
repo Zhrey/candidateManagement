@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>candidate-management-api</artifactId>
+	<version>${module.version}</version>
+	<packaging>jar</packaging>
+
+	<name>candidate-management-api</name>
+
+	<parent>
+		<groupId>com.ray.core</groupId>
+		<artifactId>candidate-management</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.ray.cloud</groupId>
+			<artifactId>framework-jetty</artifactId>
+			<version>${cloud.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ray.cloud</groupId>
+			<artifactId>framework-common</artifactId>
+			<version>${cloud.version}</version>
+		</dependency>
+	</dependencies>
+
+
+</project>
