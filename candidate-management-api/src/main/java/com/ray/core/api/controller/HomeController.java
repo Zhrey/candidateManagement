@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @Modified By:
  */
 @RestController
-@RequestMapping("")
 public class HomeController {
 
     @RequestMapping("toHomePage")

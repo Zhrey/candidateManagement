@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Modified By:
  */
 @FeignClient(value = "candidate-management")
-@RequestMapping("")
 public interface CandidateManagementService {
 
     @RequestMapping("toHomePage")
