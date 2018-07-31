@@ -23,7 +23,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ray.cloud</groupId>
-			<artifactId>framework-common</artifactId>
+			<artifactId>framework-mybatis</artifactId>
 			<version>${cloud.version}</version>
 		</dependency>
 	</dependencies>

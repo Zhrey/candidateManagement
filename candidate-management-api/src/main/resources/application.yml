@@ -3,6 +3,11 @@ server:
 spring:
   application:
     name: candidate-management
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/candidate_management?characterEncoding=utf8&useSSL=false
+    username: admin
+    password: admin
 eureka:
   instance:
     prefer-ip-address: true
