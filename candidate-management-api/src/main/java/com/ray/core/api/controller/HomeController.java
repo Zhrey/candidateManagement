@@ -1,12 +1,10 @@
 package com.ray.core.api.controller;
 
-import com.ray.cloud.framework.base.Enum.DeleteFlagEnum;
 import com.ray.cloud.framework.base.dto.ResultDTO;
 import com.ray.cloud.framework.base.dto.ResultError;
 import com.ray.cloud.framework.mybatis.entity.DUcUser;
-import com.ray.cloud.framework.mybatis.entity.DUcUserExample;
-import com.ray.cloud.framework.mybatis.service.DUcUserService;
 import com.ray.core.api.dto.UserBaseDTO;
+import com.ray.core.api.service.HomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,19 +22,19 @@ import java.util.List;
 public class HomeController {
 
     @Autowired
-    private DUcUserService dUcUserService;
+    private HomeService homeService;
 
     @RequestMapping("login")
     public ResultDTO login(@RequestBody UserBaseDTO userBaseDTO) {
-        DUcUserExample dUcUserExample = new DUcUserExample();
-        dUcUserExample.createCriteria().andUserNameEqualTo(userBaseDTO.getUsername())
-                .andPasswordEqualTo(userBaseDTO.getPassword())
-                .andDataFlagEqualTo(DeleteFlagEnum.NON_DELETE.ordinal());
-        ResultDTO<List<DUcUser>> resultDTO = dUcUserService.selectByExample(dUcUserExample);
+
+        ResultDTO<List<DUcUser>> resultDTO = homeService.login(userBaseDTO);
+
         if (resultDTO.isSuccess() && resultDTO.getData().size() > 0) {
             return ResultDTO.success(resultDTO);
         } else {
             return ResultDTO.failure(ResultError.error("用户名或密码不正确！"));
         }
+
     }
+
 }

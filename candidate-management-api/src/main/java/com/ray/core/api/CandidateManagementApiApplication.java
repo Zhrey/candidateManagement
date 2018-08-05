@@ -8,7 +8,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 //用于启动服务发现功能
 @EnableDiscoveryClient
 //用于启动Fegin功能
-@EnableFeignClients
+@EnableFeignClients(basePackages = {"com.ray.cloud"})
 @SpringBootApplication
 public class CandidateManagementApiApplication extends JettyFrameWorkServer{
 
