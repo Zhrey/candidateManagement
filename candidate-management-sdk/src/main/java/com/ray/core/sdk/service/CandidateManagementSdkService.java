@@ -4,6 +4,7 @@ import com.ray.cloud.framework.base.dto.ResultDTO;
 import com.ray.core.sdk.dto.UserBaseDTO;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -19,5 +20,5 @@ public interface CandidateManagementSdkService {
     ResultDTO login(UserBaseDTO userBaseDTO);
 
     @RequestMapping("uploadFile")
-    ResultDTO uploadFile(MultipartFile multipartFile);
+    ResultDTO uploadFile(@RequestPart("multipartFile") MultipartFile multipartFile);
 }
