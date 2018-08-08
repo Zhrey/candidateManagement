@@ -3,11 +3,11 @@ package com.ray.core.api.controller;
 import com.ray.cloud.framework.base.dto.ResultDTO;
 import com.ray.core.api.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 /**
  * Created by ZhangRui on 2018/8/5.
@@ -19,9 +19,9 @@ public class ResumeController {
     private ResumeService resumeService;
 
     @RequestMapping("uploadFile")
-    public ResultDTO uploadFile(@RequestBody MultipartFile multipartFile) {
+    public ResultDTO uploadFile(@RequestParam("fileModel") File file) {
 
-        return resumeService.uploadFile(multipartFile);
+        return resumeService.uploadFile(file);
     }
 
     @RequestMapping("downloadFile")
