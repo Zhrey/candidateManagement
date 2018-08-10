@@ -2,9 +2,9 @@ package com.ray.core.api.service.impl;
 
 import com.ray.cloud.framework.base.Enum.DeleteFlagEnum;
 import com.ray.cloud.framework.base.dto.ResultDTO;
-import com.ray.cloud.framework.mybatis.entity.DUcUser;
-import com.ray.cloud.framework.mybatis.entity.DUcUserExample;
-import com.ray.cloud.framework.mybatis.service.DUcUserService;
+import com.ray.cloud.framework.mybatis.entity.DUser;
+import com.ray.cloud.framework.mybatis.entity.DUserExample;
+import com.ray.cloud.framework.mybatis.service.DUserService;
 import com.ray.core.api.dto.UserBaseDTO;
 import com.ray.core.api.service.HomeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +19,16 @@ import java.util.List;
 public class HomeServiceImpl implements HomeService{
 
     @Autowired
-    private DUcUserService dUcUserService;
+    private DUserService dUserService;
 
-    public ResultDTO<List<DUcUser>> login(UserBaseDTO userBaseDTO) {
+    public ResultDTO<List<DUser>> login(UserBaseDTO userBaseDTO) {
 
-        DUcUserExample dUcUserExample = new DUcUserExample();
+        DUserExample dUcUserExample = new DUserExample();
         dUcUserExample.createCriteria().andUserNameEqualTo(userBaseDTO.getUsername())
                 .andPasswordEqualTo(userBaseDTO.getPassword())
                 .andDataFlagEqualTo(DeleteFlagEnum.NON_DELETE.ordinal());
-        ResultDTO<List<DUcUser>> resultDTO = dUcUserService.selectByExample(dUcUserExample);
+        ResultDTO<List<DUser>> resultDTO = dUserService.selectByExample(dUcUserExample);
 
-        return resultDTO;
+        return null;
     }
 }

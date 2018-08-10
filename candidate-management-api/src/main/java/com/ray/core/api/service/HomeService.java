@@ -1,7 +1,7 @@
 package com.ray.core.api.service;
 
 import com.ray.cloud.framework.base.dto.ResultDTO;
-import com.ray.cloud.framework.mybatis.entity.DUcUser;
+import com.ray.cloud.framework.mybatis.entity.DUser;
 import com.ray.core.api.dto.UserBaseDTO;
 
 import java.util.List;
@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface HomeService {
 
-    ResultDTO<List<DUcUser>> login(UserBaseDTO userBaseDTO);
+    ResultDTO<List<DUser>> login(UserBaseDTO userBaseDTO);
 }
