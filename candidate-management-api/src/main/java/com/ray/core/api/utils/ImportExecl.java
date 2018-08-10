@@ -122,7 +122,8 @@ public class ImportExecl {
             } else {
                 wb = new XSSFWorkbook(inputStream);
             }
-            dataLst = read(wb);
+            dataLst = read(wb,0);
+            dataLst.addAll(read(wb,1));
         } catch (IOException e) {
 
             e.printStackTrace();
@@ -131,10 +132,10 @@ public class ImportExecl {
     }
 
 
-    private List<List<String>> read(Workbook wb) {
+    private List<List<String>> read(Workbook wb,int index) {
         List<List<String>> dataLst = new ArrayList<List<String>>();
         /** 得到第一个shell */
-        Sheet sheet = wb.getSheetAt(0);
+        Sheet sheet = wb.getSheetAt(index);
         /** 得到Excel的行数 */
         this.totalRows = sheet.getPhysicalNumberOfRows();
         /** 得到Excel的列数 */
