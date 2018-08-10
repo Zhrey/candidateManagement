@@ -1,6 +1,7 @@
 package com.ray.core.api.utils;
 
 import com.ray.cloud.framework.base.dto.ResultDTO;
+import com.ray.core.api.dto.PersonBaseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -21,9 +22,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class ImportExecl {
@@ -77,8 +76,8 @@ public class ImportExecl {
         return true;
     }
 
-    public List<List<String>> read(File file, String filePath) {
-        List<List<String>> dataLst = new ArrayList<List<String>>();
+    public Map<String,List<List<String>>> read(File file, String filePath) {
+        Map<String,List<List<String>>> map = new HashMap<String,List<List<String>>>();
         InputStream is = null;
         try {
             /** 验证文件是否合法 */
@@ -93,7 +92,7 @@ public class ImportExecl {
             }
             /** 调用本类提供的根据流读取的方法 */
             is = new FileInputStream(file);
-            dataLst = read(is, isExcel2003);
+            map = read(is, isExcel2003);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -108,12 +107,12 @@ public class ImportExecl {
             }
         }
         /** 返回最后读取的结果 */
-        return dataLst;
+        return map;
     }
 
 
-    public List<List<String>> read(InputStream inputStream, boolean isExcel2003) {
-        List<List<String>> dataLst = null;
+    public Map<String,List<List<String>>> read(InputStream inputStream, boolean isExcel2003) {
+        Map<String,List<List<String>>> map = new HashMap<String,List<List<String>>>();
         try {
             /** 根据版本选择创建Workbook的方式 */
             Workbook wb = null;
@@ -122,13 +121,13 @@ public class ImportExecl {
             } else {
                 wb = new XSSFWorkbook(inputStream);
             }
-            dataLst = read(wb,0);
-            dataLst.addAll(read(wb,1));
+            map.put("sheet1", read(wb, 0));
+            map.put("sheet2", read(wb, 1));
         } catch (IOException e) {
 
             e.printStackTrace();
         }
-        return dataLst;
+        return map;
     }
 
 
@@ -195,25 +194,22 @@ public class ImportExecl {
     }
 
     /**
-     * 读取Excel返回客商信息
+     * 读取Excel候选人基本信息
      *
      * @param companyInfoStringList
      * @return
      */
     public ResultDTO readModelToCompany(List<List<String>> companyInfoStringList) {
 
-        ResultDTO resultDTO = ResultDTO.success();
+        PersonBaseDTO personBaseDTO = new PersonBaseDTO();
 
         if (companyInfoStringList != null) {
-            Field[] fields = resultDTO.getClass().getDeclaredFields();
+            Field[] fields = personBaseDTO.getClass().getDeclaredFields();
             //"第" + (i) + "行"
             int i = 0;
-            //跳过第一行
-            if (companyInfoStringList.size() > 0) {
-                companyInfoStringList.remove(0);
-            } else {
+
+            if (companyInfoStringList.size() == 0) {
                 log.error("读取excel时没有读取到数据！");
-                return null;
             }
             for (List<String> cellList : companyInfoStringList) {
 

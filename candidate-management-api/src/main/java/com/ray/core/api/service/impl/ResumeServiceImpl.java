@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ZhangRui on 2018/8/5.
@@ -36,9 +38,10 @@ public class ResumeServiceImpl implements ResumeService {
                 throw new RuntimeException("目标文件不存在！");
             }
             ImportExecl poi = new ImportExecl();
-            List<List<String>> list = poi.read(file, file.getName());
+            Map<String,List<List<String>>> map = new HashMap<String,List<List<String>>>();
+            map = poi.read(file, file.getName());
             //读取excel转换dto
-            poi.readModelToCompany(list);
+            poi.readModelToCompany(map.get("sheet1"));
 
 
         } catch (Exception e) {
