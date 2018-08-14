@@ -3,7 +3,7 @@ package com.ray.core.api.controller;
 import com.ray.cloud.framework.base.dto.ResultDTO;
 import com.ray.cloud.framework.base.dto.ResultError;
 import com.ray.cloud.framework.mybatis.entity.DUser;
-import com.ray.core.api.dto.UserBaseDTO;
+import com.ray.core.api.dto.UserLoginDTO;
 import com.ray.core.api.service.HomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +25,9 @@ public class HomeController {
     private HomeService homeService;
 
     @RequestMapping("login")
-    public ResultDTO login(@RequestBody UserBaseDTO userBaseDTO) {
+    public ResultDTO login(@RequestBody UserLoginDTO userLoginDTO) {
 
-        ResultDTO<List<DUser>> resultDTO = homeService.login(userBaseDTO);
+        ResultDTO<List<DUser>> resultDTO = homeService.login(userLoginDTO);
 
         if (resultDTO.isSuccess() && resultDTO.getData().size() > 0) {
             return ResultDTO.success(resultDTO);

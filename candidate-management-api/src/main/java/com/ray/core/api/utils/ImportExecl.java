@@ -1,9 +1,6 @@
 package com.ray.core.api.utils;
 
-import com.ray.cloud.framework.base.dto.ResultDTO;
-import com.ray.core.api.dto.PersonBaseDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -17,8 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -191,51 +186,6 @@ public class ImportExecl {
             dataLst.add(rowLst);
         }
         return dataLst;
-    }
-
-    /**
-     * 读取Excel候选人基本信息
-     *
-     * @param companyInfoStringList
-     * @return
-     */
-    public ResultDTO readModelToCompany(List<List<String>> companyInfoStringList) {
-
-        PersonBaseDTO personBaseDTO = new PersonBaseDTO();
-
-        if (companyInfoStringList != null) {
-            Field[] fields = personBaseDTO.getClass().getDeclaredFields();
-            //"第" + (i) + "行"
-            int i = 0;
-
-            if (companyInfoStringList.size() == 0) {
-                log.error("读取excel时没有读取到数据！");
-            }
-            for (List<String> cellList : companyInfoStringList) {
-
-                //"第" + 2 + "列"
-                if (StringUtils.isNotEmpty(cellList.get(2))) {
-                    try {
-                        fields[i].setAccessible(true);
-                        if (fields[i].getType() == Integer.class) {
-//                            fields[i].set(resultDTO, bizmap.get(WDWUtil.ran2fuc(cellList.get(2))));
-                        } else if (fields[i].getType() == BigDecimal.class) {
-//                            fields[i].set(resultDTO, new BigDecimal(cellList.get(2)));
-                        } else {
-
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        log.error("赋值错误：" + e.getMessage(), e);
-                        return null;
-                    }
-                }
-                i++;
-            }
-        } else {
-            log.error("companyInfoStringList：null");
-        }
-        return null;
     }
 
 }

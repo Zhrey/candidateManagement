@@ -17,7 +17,7 @@ public class PersonBaseDTO extends AbstractDTO{
     //姓名
     private String name;
     //性别
-    private Integer sex;
+    private String sex;
     //出生日期
     private Date birthday;
     //工作年限
@@ -37,5 +37,5 @@ public class PersonBaseDTO extends AbstractDTO{
     //学校名称
     private String school;
     //最高学历
-    private Integer maxEducation;
+    private String maxEducation;
 }

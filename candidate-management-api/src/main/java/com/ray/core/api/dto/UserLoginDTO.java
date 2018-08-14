@@ -10,7 +10,7 @@ import lombok.Data;
  * @Modified By:
  */
 @Data
-public class UserBaseDTO extends AbstractDTO{
+public class UserLoginDTO extends AbstractDTO{
 
     //用户名
     private String username;
