@@ -33,6 +33,12 @@
 			<artifactId>framework-file-sdk</artifactId>
 			<version>${module.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.ray.core</groupId>
+			<artifactId>candidate-management-sdk</artifactId>
+			<version>${module.version}</version>
+		</dependency>
+
 
 		<!-- word -->
         <dependency>

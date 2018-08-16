@@ -1,7 +1,8 @@
 package com.ray.core.sdk.service;
 
+import com.ray.cloud.framework.base.dto.PageResultDTO;
 import com.ray.cloud.framework.base.dto.ResultDTO;
-import com.ray.core.sdk.dto.UserBaseDTO;
+import com.ray.core.sdk.dto.*;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +21,31 @@ public interface CandidateManagementSdkService {
     @RequestMapping("login")
     ResultDTO login(UserBaseDTO userBaseDTO);
 
-    @RequestMapping(value = "uploadFile")
+    /**
+     * @Author: ZhangRui
+     * @param: searchCandidateDTO
+     * @Description: 查询候选人基本信息
+     * @date: Created in 11:33 2018/8/16
+     */
+    @RequestMapping(value = "resume/searchCandidate")
+    ResultDTO<PageResultDTO<SearchCandidateResultDTO>> searchCandidate(SearchCandidateDTO searchCandidateDTO);
+
+    /**
+     * @Author: ZhangRui
+     * @param: searchResumeDTO
+     * @Description: 查询简历基本信息
+     * @date: Created in 11:33 2018/8/16
+     */
+    @RequestMapping(value = "resume/searchResume")
+    ResultDTO<PageResultDTO<SearchResumeResultDTO>> searchResume(SearchResumeDTO searchResumeDTO);
+
+    /**
+     * @Author: ZhangRui
+     * @param: multipartFile
+     * @Description: 上传简历
+     * @date: Created in 11:33 2018/8/16
+     */
+    @RequestMapping(value = "resume/uploadFile")
     ResultDTO uploadFile(@RequestParam("fileModel") File file);
 
 }

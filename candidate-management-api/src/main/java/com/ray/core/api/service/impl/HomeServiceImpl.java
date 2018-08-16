@@ -1,6 +1,6 @@
 package com.ray.core.api.service.impl;
 
-import com.ray.cloud.framework.base.Enum.DeleteFlagEnum;
+import com.ray.cloud.framework.base.Enum.DataFlagEnum;
 import com.ray.cloud.framework.base.dto.ResultDTO;
 import com.ray.cloud.framework.mybatis.entity.DUser;
 import com.ray.cloud.framework.mybatis.entity.DUserExample;
@@ -26,7 +26,7 @@ public class HomeServiceImpl implements HomeService{
         DUserExample dUcUserExample = new DUserExample();
         dUcUserExample.createCriteria().andUserNameEqualTo(userLoginDTO.getUsername())
                 .andPasswordEqualTo(userLoginDTO.getPassword())
-                .andDataFlagEqualTo(DeleteFlagEnum.NON_DELETE.ordinal());
+                .andDataFlagEqualTo(DataFlagEnum.NON_DELETE.ordinal());
         ResultDTO<List<DUser>> resultDTO = dUserService.selectByExample(dUcUserExample);
 
         return resultDTO;
