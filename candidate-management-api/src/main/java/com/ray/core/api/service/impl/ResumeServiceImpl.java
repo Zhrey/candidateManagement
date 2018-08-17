@@ -11,6 +11,7 @@ import com.ray.cloud.framework.mybatis.entity.DResumeExample;
 import com.ray.cloud.framework.mybatis.service.DPersonBaseService;
 import com.ray.cloud.framework.mybatis.service.DResumeService;
 import com.ray.core.api.convertor.ResumeConvertor;
+import com.ray.core.api.enums.InfoTagEnum;
 import com.ray.core.api.enums.PersonBaseEnum;
 import com.ray.core.api.enums.ResumeEnum;
 import com.ray.core.api.service.ResumeService;
@@ -28,10 +29,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by ZhangRui on 2018/8/5.
@@ -63,20 +61,41 @@ public class ResumeServiceImpl implements ResumeService {
      */
     public ResultDTO<PageResultDTO<SearchResumeResultDTO>> searchResume(SearchResumeDTO searchResumeDTO) {
 
-        DResumeExample dResumeExample = new DResumeExample();
-        DResumeExample.Criteria criteria = dResumeExample.createCriteria();
+
+        DPersonBaseExample dPersonBaseExample = new DPersonBaseExample();
+        DPersonBaseExample.Criteria criteria = dPersonBaseExample.createCriteria();
         criteria.andDataFlagEqualTo(0);
+        dPersonBaseExample.setOrderByClause("CREATE_TIME DESC");
 
-        ResultDTO<PageResultDTO<DResume>> resultDTO = dResumeService
-                .selectByExamplePageable(dResumeExample,searchResumeDTO.getPageNo(),searchResumeDTO.getPageSize());
+        ResultDTO<PageResultDTO<DPersonBase>> resultDTO = dPersonBaseService
+                .selectByExamplePageable(dPersonBaseExample,searchResumeDTO.getPageNo(),searchResumeDTO.getPageSize());
 
-        if (resultDTO.isSuccess()) {
+        if (resultDTO.isSuccess() && resultDTO.getData().getRows() != null) {
+
             ResumeConvertor resumeConvertor = new ResumeConvertor();
+            List<SearchResumeResultDTO> list = new ArrayList<>();
+            //循环人员匹配合同信息
+            for(DPersonBase dPersonBase : resultDTO.getData().getRows()){
 
-            return resumeConvertor.toPageResultDTO(resultDTO.getData());
-        } else {
-            return ResultDTO.failure(ResultError.error("请联系管理员，获取简历信息异常！"));
+                DResumeExample dResumeExample = new DResumeExample();
+                dResumeExample.createCriteria().andDataFlagEqualTo(0)
+                        .andPersonIdEqualTo(dPersonBase.getId());
+                ResultDTO<List<DResume>> resumeResultDTO = dResumeService.selectByExample(dResumeExample);
+                if (resumeResultDTO.isSuccess()) {
+                    SearchResumeResultDTO searchResumeResultDTO = resumeConvertor.toDTO(resumeResultDTO.getData().get(0));
+                    resumeConvertor.personInfoToDTO(searchResumeResultDTO,dPersonBase);
+                    list.add(searchResumeResultDTO);
+
+                }else{
+                    log.error("查询简历基本信息失败，数据："+ resumeResultDTO.getData());
+                }
+            }
+            return ResultDTO.success(PageResultDTO.rows(resultDTO.getData().getTotal(), list));
+
+        }else {
+            log.error("查询人员基本信息失败，数据："+ resultDTO.getData());
         }
+        return ResultDTO.failure(ResultError.error("请联系管理员，获取简历信息异常！"));
     }
 
     /**
@@ -99,14 +118,16 @@ public class ResumeServiceImpl implements ResumeService {
             log.error("读取excel时没有读取到数据！");
             return ResultDTO.failure(ResultError.error("简历模板异常，没有获取到相应信息！"));
         }
-        //将简历sheet1中数据集合转换为键值对形式
-        Map<String, Object> baseMap = listToMap(map.get("sheet1"));
+        //将简历sheet1中数据集合转换为键值对形式 name = 张三
+        Map<String, Object> sheet1Map = sheet1ToMap(map.get("sheet1"));
+        //将简历sheet2中数据集合转换为键值对形式
+        Map<String, Object> sheet2Map = sheet2ToMap(map.get("sheet2"));
 
         //读取excel1转换dto
-        ResultDTO baseRes = readExcelToBaseInfo(baseMap);
+        ResultDTO baseRes = readExcelToBaseInfo(sheet1Map,sheet2Map);
         if (baseRes.isSuccess()) {
             //保存简历基本信息
-            ResultDTO resumeResult = readExcelToResumeInfo(baseMap,(String) baseRes.getData());
+            ResultDTO resumeResult = readExcelToResumeInfo(sheet1Map,(String) baseRes.getData());
 
             if (!resumeResult.isSuccess()) {
                 //保存简历基本信息出错
@@ -116,6 +137,7 @@ public class ResumeServiceImpl implements ResumeService {
             //保存人员基本信息出错
             return baseRes;
         }
+
 
 //        ResultDTO resultDTO = fileSdkService.uploadFile(file);
         return ResultDTO.success();
@@ -127,7 +149,7 @@ public class ResumeServiceImpl implements ResumeService {
      * @Description:   将简历sheet1中数据集合转换为键值对形式
      * @date: Created in 17:05 2018/8/14
      */
-    private Map<String, Object> listToMap(List<List<String>> list) {
+    private Map<String, Object> sheet1ToMap(List<List<String>> list) {
 
         Map<String, Object> map = new HashMap<String, Object>();
 
@@ -152,20 +174,55 @@ public class ResumeServiceImpl implements ResumeService {
 
 
     /**
+     * @Author: ZhangRui
+     * @param: list 简历sheet2中数据
+     * @Description:   将简历sheet2中数据集合转换为键值对形式
+     * @date: Created in 17:05 2018/8/14
+     */
+    private Map<String, Object> sheet2ToMap(List<List<String>> list) {
+
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        List<String> keys = list.get(0);
+        List<String> vals = list.get(1);
+
+        //不同阶段值不同
+        int flag = 0;
+
+        for(List<String> strList : list){
+            String key = strList.get(0);
+            String val = strList.get(1);
+            if (StringUtils.isNotEmpty(key) && InfoTagEnum.getValue(key) != null) {
+                flag = InfoTagEnum.getValue(key);
+            }
+            //人员基本信息
+            if (flag == 0) {
+                map.put(key, val);
+            }
+        }
+
+        return map;
+    }
+
+
+    /**
      * 读取Excel候选人基本信息
      *
      * @param param
      * @return
      */
-    private ResultDTO readExcelToBaseInfo(Map<String, Object> param) {
+    private ResultDTO readExcelToBaseInfo(Map<String, Object> param,Map<String, Object> map) {
 
         DPersonBase dPersonBase = new DPersonBase();
 
-        //转换
+        //sheet1中信息转换
         ResultDTO result = mapToEntity(dPersonBase, param);
         if (!result.isSuccess()) {
             return result;
         }
+        //sheet2中部分信息转换
+        mapToEntity(dPersonBase, map);
+
         DPersonBaseExample dPersonBaseExample = new DPersonBaseExample();
         //验证该候选人是否已经导入过
         dPersonBaseExample.createCriteria()

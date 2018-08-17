@@ -13,6 +13,7 @@ import lombok.Data;
 public class SearchResumeResultDTO extends AbstractDTO{
 
     /************************人员基本信息*************************/
+    private String personId;
     //姓名
     private String name;
     //性别

@@ -39,6 +39,7 @@ public class CandidateServiceImpl implements CandidateService {
             criteria.andNameEqualTo(searchCandidateDTO.getName());
         }
         criteria.andDataFlagEqualTo(0);
+        dPersonBaseExample.setOrderByClause("CREATE_TIME DESC");
 
         ResultDTO<PageResultDTO<DPersonBase>> resultDTO = dPersonBaseService
                 .selectByExamplePageable(dPersonBaseExample,searchCandidateDTO.getPageNo(),searchCandidateDTO.getPageSize());

@@ -16,3 +16,12 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:8001/eureka
+
+excel:
+  position:
+    baseName: 个人基本信息
+    careerName: 求职意向
+    selfName: 自我评价
+    workName: 工作经历
+    projectName: 项目经验
+    educationName: 项目名称：
