@@ -11,9 +11,7 @@ import com.ray.cloud.framework.mybatis.entity.DResumeExample;
 import com.ray.cloud.framework.mybatis.service.DPersonBaseService;
 import com.ray.cloud.framework.mybatis.service.DResumeService;
 import com.ray.core.api.convertor.ResumeConvertor;
-import com.ray.core.api.enums.InfoTagEnum;
-import com.ray.core.api.enums.PersonBaseEnum;
-import com.ray.core.api.enums.ResumeEnum;
+import com.ray.core.api.enums.*;
 import com.ray.core.api.service.ResumeService;
 import com.ray.core.api.utils.ImportExecl;
 import com.ray.core.api.utils.WDWUtil;
@@ -183,22 +181,174 @@ public class ResumeServiceImpl implements ResumeService {
 
         Map<String, Object> map = new HashMap<String, Object>();
 
-        List<String> keys = list.get(0);
-        List<String> vals = list.get(1);
-
         //不同阶段值不同
         int flag = 0;
+        //工作经历
+        int indexWork = 0;
+        List<Map<String, String>> workList = new ArrayList<>();
+        map.put("workExperience", workList);
+        Map<String, String> workMap = new HashMap<>();
+        //项目经验
+        List<Map<String, String>> projectList = new ArrayList<>();
+        map.put("projectExperience", projectList);
+        Map<String, String> projectMap = new HashMap<>();
+        //教育经历
+        int indexEducation = 0;
+        StringBuilder educationBuilder = new StringBuilder();
+        //培训经历
+        List<Map<String, String>> trainList = new ArrayList<>();
+        map.put("trainExperience", trainList);
+        Map<String, String> trainMap = new HashMap<>();
+        //证书
+        int indexCard = 0;
+        List<Map<String, String>> cardList = new ArrayList<>();
+        map.put("card", cardList);
+        Map<String, String> cardMap = new HashMap<>();
+        //在校学习情况
+        int indexLearn = 0;
+        StringBuilder learnBuilder = new StringBuilder();
+        //在校实践经验
+        int indexSocial = 0;
+        StringBuilder socialBuilder = new StringBuilder();
+        //语言能力
+        int indexLanguage = 0;
+        StringBuilder languageBuilder = new StringBuilder();
+        //专业技能
+        int indexSkill = 0;
+        StringBuilder skillBuilder = new StringBuilder();
+        //兴趣爱好
+        int indexHobby = 0;
+        StringBuilder hobbyBuilder = new StringBuilder();
 
         for(List<String> strList : list){
             String key = strList.get(0);
             String val = strList.get(1);
-            if (StringUtils.isNotEmpty(key) && InfoTagEnum.getValue(key) != null) {
-                flag = InfoTagEnum.getValue(key);
+            if (StringUtils.isNotEmpty(key) && TotalTagsEnum.getValue(key) != null) {
+                flag = TotalTagsEnum.getValue(key);
             }
             //人员基本信息
-            if (flag == 0) {
-                map.put(key, val);
+            if (flag == 0 && StringUtils.isNotEmpty(BaseTagEnum.getValue(key))) {
+                map.put(BaseTagEnum.getValue(key), val);
             }
+            //求职意向
+            if (flag == 1 && StringUtils.isNotEmpty(CareerTagEnum.getValue(key))) {
+                map.put(CareerTagEnum.getValue(key), val);
+            }
+            //自我评价
+            if (flag == 2 && StringUtils.isEmpty(key)) {
+                map.put("content", val);
+            }
+            //工作经历
+            if (flag == 3) {
+                if (indexWork == 0) {
+                    indexWork++;
+                } else if (indexWork == 1) {
+                    workMap.put("startDate", val);
+                    indexWork++;
+                } else if (indexWork == 2) {
+                    workMap.put("salary", val);
+                    indexWork++;
+                }else if (indexWork == 3){
+                    workMap.put("position", val);
+                    indexWork++;
+                }else if (indexWork == 4){
+                    indexWork = 0;
+                    workMap.put("content", val);
+                    workList.add(workMap);
+                    workMap = new HashMap<>();
+                }
+            }
+            //项目经验
+            if (flag == 5) {
+                projectMap = new HashMap<>();
+                projectList.add(projectMap);
+                projectMap.put(ProjectTagEnum.getValue(key), val);
+            } else if (flag == 6) {
+                projectMap.put(ProjectTagEnum.getValue(key), val);
+            } else if (flag == 7) {
+                projectMap.put(ProjectTagEnum.getValue(key), val);
+            }
+            //教育经历
+            if (flag == 8 && indexEducation == 0) {
+                indexEducation++;
+            }else if (flag == 8 && indexEducation == 1) {
+                educationBuilder.append("\r\n"+val);
+            }
+            if (flag == 9) {
+                if (educationBuilder.toString().length() >= 2) {
+                    map.put("educationExperience", educationBuilder.toString().substring(2));
+                }
+            }
+            //培训经历
+            if (flag == 10) {
+                trainMap = new HashMap<>();
+                trainList.add(trainMap);
+                trainMap.put(TrainTagEnum.getValue(key), val);
+            } else if (flag == 11) {
+                trainMap.put(TrainTagEnum.getValue(key), val);
+            } else if (flag == 12) {
+                trainMap.put(TrainTagEnum.getValue(key), val);
+            } else if (flag == 13) {
+                trainMap.put(TrainTagEnum.getValue(key), val);
+            }
+            //证书
+            if (flag == 14) {
+                if (indexCard == 0) {
+                    indexCard++;
+                } else if (indexCard == 1) {
+                    cardMap.put("cardName", val);
+                    indexCard++;
+                } else if (indexCard == 2) {
+                    indexCard = 0;
+                    cardList.add(cardMap);
+                    cardMap = new HashMap<>();
+                }
+            }
+
+            //在校学习情况
+            if (flag == 15 && indexLearn == 0) {
+                indexLearn++;
+            }else if (flag == 15 && indexLearn == 1) {
+                learnBuilder.append("\r\n"+val);
+            }
+            //在校实践经验
+            if (flag == 16 && indexSocial == 0) {
+                if (learnBuilder.toString().length() >= 2) {
+                    map.put("learn", learnBuilder.toString().substring(2));
+                }
+                indexSocial++;
+            }else if (flag == 16 && indexSocial == 1) {
+                socialBuilder.append("\r\n"+val);
+            }
+            //语言能力
+            if (flag == 17 && indexLanguage == 0) {
+                if (socialBuilder.toString().length() >= 2) {
+                    map.put("social", socialBuilder.toString().substring(2));
+                }
+                indexLanguage++;
+            }else if (flag == 17 && indexLanguage == 1) {
+                languageBuilder.append("\r\n"+val);
+            }
+            //专业技能
+            if (flag == 18 && indexSkill == 0) {
+                if (languageBuilder.toString().length() >= 2) {
+                    map.put("language", languageBuilder.toString().substring(2));
+                }
+                indexSkill++;
+            }else if (flag == 18 && indexSkill == 1) {
+                skillBuilder.append("\r\n"+val);
+            }
+            //兴趣爱好
+            if (flag == 19 && indexHobby == 0) {
+                if (skillBuilder.toString().length() >= 2) {
+                    map.put("skill", skillBuilder.toString().substring(2));
+                }
+                indexHobby++;
+            }else if (flag == 19 && indexHobby == 1) {
+                hobbyBuilder.append(val);
+                map.put("hobby", hobbyBuilder.toString());
+            }
+
         }
 
         return map;

@@ -6,7 +6,7 @@ package com.ray.core.api.enums;
  * @date: Created in 14:20 2018/8/9
  * @Modified By:
  */
-public enum InfoTagEnum {
+public enum TotalTagsEnum {
 
     BASE_TAG("个人基本信息",0),
     CAREER_TAG("求职意向",1),
@@ -33,17 +33,17 @@ public enum InfoTagEnum {
     private String name;
     private Integer value;
 
-    InfoTagEnum(String name, Integer value) {
+    TotalTagsEnum(String name, Integer value) {
         this.name = name;
         this.value = value;
     }
 
     public static Integer getValue(String name) {
 
-        for (InfoTagEnum infoTagEnum : InfoTagEnum.values()) {
+        for (TotalTagsEnum totalTagsEnum : TotalTagsEnum.values()) {
 
-            if (infoTagEnum.name.equals(name)) {
-                return infoTagEnum.value;
+            if (totalTagsEnum.name.equals(name)) {
+                return totalTagsEnum.value;
             }
 
         }

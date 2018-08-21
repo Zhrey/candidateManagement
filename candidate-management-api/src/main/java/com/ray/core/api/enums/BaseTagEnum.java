@@ -6,7 +6,7 @@ package com.ray.core.api.enums;
  * @date: Created in 14:20 2018/8/9
  * @Modified By:
  */
-public enum PersonInfoEnum {
+public enum BaseTagEnum {
 
     MARITAL_STATUS("婚姻状况","maritalStatus"),
     POLITICAL_STATUS("政治面貌","politicalStatus"),
@@ -17,17 +17,17 @@ public enum PersonInfoEnum {
     private String name;
     private String value;
 
-    PersonInfoEnum(String name, String value) {
+    BaseTagEnum(String name, String value) {
         this.name = name;
         this.value = value;
     }
 
     public static String getValue(String name) {
 
-        for (PersonInfoEnum personInfoEnum : PersonInfoEnum.values()) {
+        for (BaseTagEnum baseTagEnum : BaseTagEnum.values()) {
 
-            if (personInfoEnum.name.equals(name)) {
-                return personInfoEnum.value;
+            if (baseTagEnum.name.equals(name)) {
+                return baseTagEnum.value;
             }
 
         }
