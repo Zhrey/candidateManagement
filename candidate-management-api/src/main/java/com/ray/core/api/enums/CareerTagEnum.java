@@ -9,9 +9,9 @@ package com.ray.core.api.enums;
 public enum CareerTagEnum {
 
     DESIRED_NATRUE("期望工作性质：","desiredNatrue"),
-    DESIRED_POSITION("期望从事职业：","desiredposition"),
+    DESIRED_POSITION("期望从事职业：","desiredPosition"),
     DESIRED_INDUSTRY("期望从事行业：","desiredIndustry"),
-    DESIRED_ADDRESS("期望工作地区：：","desiredAddress"),
+    DESIRED_ADDRESS("期望工作地区：","desiredAddress"),
     CURRENT_SITUATION("目前状况：","currentSituation");
 
     // 成员变量

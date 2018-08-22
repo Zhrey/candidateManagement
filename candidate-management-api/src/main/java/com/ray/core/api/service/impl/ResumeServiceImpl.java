@@ -4,12 +4,8 @@ import com.ray.cloud.framework.base.dto.PageResultDTO;
 import com.ray.cloud.framework.base.dto.ResultDTO;
 import com.ray.cloud.framework.base.dto.ResultError;
 import com.ray.cloud.framework.file.sdk.service.FileSdkService;
-import com.ray.cloud.framework.mybatis.entity.DPersonBase;
-import com.ray.cloud.framework.mybatis.entity.DPersonBaseExample;
-import com.ray.cloud.framework.mybatis.entity.DResume;
-import com.ray.cloud.framework.mybatis.entity.DResumeExample;
-import com.ray.cloud.framework.mybatis.service.DPersonBaseService;
-import com.ray.cloud.framework.mybatis.service.DResumeService;
+import com.ray.cloud.framework.mybatis.entity.*;
+import com.ray.cloud.framework.mybatis.service.*;
 import com.ray.core.api.convertor.ResumeConvertor;
 import com.ray.core.api.enums.*;
 import com.ray.core.api.service.ResumeService;
@@ -41,9 +37,20 @@ public class ResumeServiceImpl implements ResumeService {
 
     @Autowired
     private DPersonBaseService dPersonBaseService;
-
     @Autowired
     private DResumeService dResumeService;
+    @Autowired
+    private DJobWantService dJobWantService;
+    @Autowired
+    private DCardsService dCardsService;
+    @Autowired
+    private DWorkExperienceService dWorkExperienceService;
+    @Autowired
+    private DProjectExperienceService dProjectExperienceService;
+    @Autowired
+    private DTrainExperienceService dTrainExperienceService;
+    @Autowired
+    private DPersonOtherService dPersonOtherService;
 
     public ResultDTO downloadFile(String filePath, String fileName){
 
@@ -131,22 +138,50 @@ public class ResumeServiceImpl implements ResumeService {
                 //保存简历基本信息出错
                 return resumeResult;
             }
+            //保存候选人求职意向
+            ResultDTO jobWantResult = readExcelToJobInfo(sheet2Map,(String) baseRes.getData());
+            if (!jobWantResult.isSuccess()) {
+                return jobWantResult;
+            }
+
+            ResultDTO otherResult = readExcelToOtherInfo(sheet2Map,(String) baseRes.getData());
+            if (!otherResult.isSuccess()) {
+                return otherResult;
+            }
+
+            ResultDTO workResult = readExcelToWorkInfo(sheet2Map,(String) baseRes.getData());
+            if (!workResult.isSuccess()) {
+                return workResult;
+            }
+            ResultDTO projectResult = readExcelToProjectInfo(sheet2Map,(String) baseRes.getData());
+            if (!projectResult.isSuccess()) {
+                return projectResult;
+            }
+            ResultDTO trainResult = readExcelToTrainInfo(sheet2Map,(String) baseRes.getData());
+            if (!trainResult.isSuccess()) {
+                return trainResult;
+            }
+            ResultDTO cardResult = readExcelToCardInfo(sheet2Map,(String) baseRes.getData());
+            if (!cardResult.isSuccess()) {
+                return cardResult;
+            }
+
         }else{
             //保存人员基本信息出错
             return baseRes;
         }
-
-
 //        ResultDTO resultDTO = fileSdkService.uploadFile(file);
         return ResultDTO.success();
     }
 
+    //region 将简历sheet1中数据集合转换为键值对形式
     /**
      * @Author: ZhangRui
      * @param: list 简历sheet1中数据
      * @Description:   将简历sheet1中数据集合转换为键值对形式
      * @date: Created in 17:05 2018/8/14
      */
+    //endregion
     private Map<String, Object> sheet1ToMap(List<List<String>> list) {
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -170,13 +205,14 @@ public class ResumeServiceImpl implements ResumeService {
         return map;
     }
 
-
+    //region 将简历sheet2中数据集合转换为键值对形式
     /**
      * @Author: ZhangRui
      * @param: list 简历sheet2中数据
      * @Description:   将简历sheet2中数据集合转换为键值对形式
      * @date: Created in 17:05 2018/8/14
      */
+    //endregion
     private Map<String, Object> sheet2ToMap(List<List<String>> list) {
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -249,11 +285,11 @@ public class ResumeServiceImpl implements ResumeService {
                     workMap.put("salary", val);
                     indexWork++;
                 }else if (indexWork == 3){
-                    workMap.put("position", val);
+                    workMap.put("content", val);
                     indexWork++;
                 }else if (indexWork == 4){
-                    indexWork = 0;
-                    workMap.put("content", val);
+                    indexWork = 1;
+                    workMap.put("position", val);
                     workList.add(workMap);
                     workMap = new HashMap<>();
                 }
@@ -276,7 +312,7 @@ public class ResumeServiceImpl implements ResumeService {
             }
             if (flag == 9) {
                 if (educationBuilder.toString().length() >= 2) {
-                    map.put("educationExperience", educationBuilder.toString().substring(2));
+                    map.put("educationBackground", educationBuilder.toString().substring(2));
                 }
             }
             //培训经历
@@ -299,7 +335,7 @@ public class ResumeServiceImpl implements ResumeService {
                     cardMap.put("cardName", val);
                     indexCard++;
                 } else if (indexCard == 2) {
-                    indexCard = 0;
+                    indexCard = 1;
                     cardList.add(cardMap);
                     cardMap = new HashMap<>();
                 }
@@ -314,7 +350,7 @@ public class ResumeServiceImpl implements ResumeService {
             //在校实践经验
             if (flag == 16 && indexSocial == 0) {
                 if (learnBuilder.toString().length() >= 2) {
-                    map.put("learn", learnBuilder.toString().substring(2));
+                    map.put("learnSituation", learnBuilder.toString().substring(2));
                 }
                 indexSocial++;
             }else if (flag == 16 && indexSocial == 1) {
@@ -323,7 +359,7 @@ public class ResumeServiceImpl implements ResumeService {
             //语言能力
             if (flag == 17 && indexLanguage == 0) {
                 if (socialBuilder.toString().length() >= 2) {
-                    map.put("social", socialBuilder.toString().substring(2));
+                    map.put("socialSituation", socialBuilder.toString().substring(2));
                 }
                 indexLanguage++;
             }else if (flag == 17 && indexLanguage == 1) {
@@ -332,7 +368,7 @@ public class ResumeServiceImpl implements ResumeService {
             //专业技能
             if (flag == 18 && indexSkill == 0) {
                 if (languageBuilder.toString().length() >= 2) {
-                    map.put("language", languageBuilder.toString().substring(2));
+                    map.put("languageSituation", languageBuilder.toString().substring(2));
                 }
                 indexSkill++;
             }else if (flag == 18 && indexSkill == 1) {
@@ -341,7 +377,7 @@ public class ResumeServiceImpl implements ResumeService {
             //兴趣爱好
             if (flag == 19 && indexHobby == 0) {
                 if (skillBuilder.toString().length() >= 2) {
-                    map.put("skill", skillBuilder.toString().substring(2));
+                    map.put("professionalSkills", skillBuilder.toString().substring(2));
                 }
                 indexHobby++;
             }else if (flag == 19 && indexHobby == 1) {
@@ -354,13 +390,13 @@ public class ResumeServiceImpl implements ResumeService {
         return map;
     }
 
-
+    //region 读取Excel候选人基本信息
     /**
      * 读取Excel候选人基本信息
-     *
      * @param param
      * @return
      */
+    //endregion
     private ResultDTO readExcelToBaseInfo(Map<String, Object> param,Map<String, Object> map) {
 
         DPersonBase dPersonBase = new DPersonBase();
@@ -393,12 +429,186 @@ public class ResumeServiceImpl implements ResumeService {
         }
 
     }
+
+    //region 读取Excel求职意向信息
     /**
-     * 读取Excel简历基本信息
-     *
+     * 读取Excel求职意向信息
      * @param param
      * @return
      */
+    //endregion
+    private ResultDTO readExcelToJobInfo(Map<String, Object> param,String personId) {
+
+        DJobWant dJobWant = new DJobWant();
+        //转换
+        ResultDTO result = mapToEntity(dJobWant, param);
+        if (!result.isSuccess()) {
+            return result;
+        }
+        dJobWant.setPersonId(personId);
+        ResultDTO<String> resultDTO = dJobWantService.insertSelective(dJobWant);
+        if (resultDTO.isSuccess()) {
+            return resultDTO;
+        }else {
+
+            return ResultDTO.failure(ResultError.error("请联系管理员，职意向信息入库失败！"));
+        }
+
+    }
+
+    //region 读取Excel候选人其他附属信息
+    /**
+     * 读取Excel候选人其他附属信息
+     * @param param
+     * @return
+     */
+    //endregion
+    private ResultDTO readExcelToOtherInfo(Map<String, Object> param,String personId) {
+
+        DPersonOther dPersonOther = new DPersonOther();
+        //转换
+        ResultDTO result = mapToEntity(dPersonOther, param);
+        if (!result.isSuccess()) {
+            return result;
+        }
+        dPersonOther.setPersonId(personId);
+        ResultDTO<String> resultDTO = dPersonOtherService.insertSelective(dPersonOther);
+        if (resultDTO.isSuccess()) {
+            return resultDTO;
+        }else {
+
+            return ResultDTO.failure(ResultError.error("请联系管理员，候选人其他附属信息入库失败！"));
+        }
+
+    }
+
+    //region 读取Excel候选人工作经历信息
+    /**
+     * 读取Excel候选人工作经历信息
+     * @param param
+     * @return
+     */
+    //endregion
+    private ResultDTO readExcelToWorkInfo(Map<String, Object> param,String personId) {
+
+        if (param.get("workExperience") != null) {
+            List<Map<String, Object>> list = (List<Map<String, Object>>) param.get("workExperience");
+            for (Map<String, Object> map : list) {
+
+                DWorkExperience dWorkExperience = new DWorkExperience();
+                //转换
+                ResultDTO result = mapToEntity(dWorkExperience, map);
+                if (!result.isSuccess()) {
+                    return result;
+                }
+                dWorkExperience.setPersonId(personId);
+                ResultDTO<String> resultDTO = dWorkExperienceService.insertSelective(dWorkExperience);
+                if (!resultDTO.isSuccess()) {
+                    return ResultDTO.failure(ResultError.error("请联系管理员，候选人工作经历信息入库失败！"));
+                }
+            }
+        }
+        return ResultDTO.success();
+
+    }
+
+    //region 读取Excel候选人项目经验信息
+    /**
+     * 读取Excel候选人项目经验信息
+     * @param param
+     * @return
+     */
+    //endregion
+    private ResultDTO readExcelToProjectInfo(Map<String, Object> param,String personId) {
+
+        if (param.get("projectExperience") != null) {
+            List<Map<String, Object>> list = (List<Map<String, Object>>) param.get("projectExperience");
+            for (Map<String, Object> map : list) {
+
+                DProjectExperience dProjectExperience = new DProjectExperience();
+                //转换
+                ResultDTO result = mapToEntity(dProjectExperience, map);
+                if (!result.isSuccess()) {
+                    return result;
+                }
+                dProjectExperience.setPersonId(personId);
+                ResultDTO<String> resultDTO = dProjectExperienceService.insertSelective(dProjectExperience);
+                if (!resultDTO.isSuccess()) {
+                    return ResultDTO.failure(ResultError.error("请联系管理员，候选人项目经验信息入库失败！"));
+                }
+            }
+        }
+        return ResultDTO.success();
+
+    }
+
+    //region 读取Excel候选人培训经历信息
+    /**
+     * 读取Excel候选人培训经历信息
+     * @param param
+     * @return
+     */
+    //endregion
+    private ResultDTO readExcelToTrainInfo(Map<String, Object> param,String personId) {
+
+        if (param.get("trainExperience") != null) {
+            List<Map<String, Object>> list = (List<Map<String, Object>>) param.get("trainExperience");
+            for (Map<String, Object> map : list) {
+
+                DTrainExperience dTrainExperience = new DTrainExperience();
+                //转换
+                ResultDTO result = mapToEntity(dTrainExperience, map);
+                if (!result.isSuccess()) {
+                    return result;
+                }
+                dTrainExperience.setPersonId(personId);
+                ResultDTO<String> resultDTO = dTrainExperienceService.insertSelective(dTrainExperience);
+                if (!resultDTO.isSuccess()) {
+                    return ResultDTO.failure(ResultError.error("请联系管理员，培训经历信息入库失败！"));
+                }
+            }
+        }
+        return ResultDTO.success();
+
+    }
+
+    //region 读取Excel候选人证书信息
+    /**
+     * 读取Excel候选人证书信息
+     * @param param
+     * @return
+     */
+    //endregion
+    private ResultDTO readExcelToCardInfo(Map<String, Object> param,String personId) {
+
+        if (param.get("card") != null) {
+            List<Map<String, Object>> list = (List<Map<String, Object>>) param.get("card");
+            for (Map<String, Object> map : list) {
+
+                DCards dCards = new DCards();
+                //转换
+                ResultDTO result = mapToEntity(dCards, map);
+                if (!result.isSuccess()) {
+                    return result;
+                }
+                dCards.setPersonId(personId);
+                ResultDTO<String> resultDTO = dCardsService.insertSelective(dCards);
+                if (!resultDTO.isSuccess()) {
+                    return ResultDTO.failure(ResultError.error("请联系管理员，候选人证书信息入库失败！"));
+                }
+            }
+        }
+        return ResultDTO.success();
+
+    }
+
+    //region 读取Excel简历基本信息
+    /**
+     * 读取Excel简历基本信息
+     * @param param
+     * @return
+     */
+    //endregion
     private ResultDTO readExcelToResumeInfo(Map<String, Object> param,String personId) {
 
         DResume dResume = new DResume();
@@ -417,7 +627,6 @@ public class ResumeServiceImpl implements ResumeService {
         }
 
     }
-
 
     private<T> ResultDTO mapToEntity(T t,Map<String, Object> param) {
 
@@ -444,8 +653,6 @@ public class ResumeServiceImpl implements ResumeService {
                         Date birthday = simpleDateFormat.parse((String) param.get(field.getName()));
                         field.set(t, birthday);
                     } else {
-                        log.info(field.getName());
-                        log.info(WDWUtil.ran2fuc((String) param.get(field.getName())));
                         field.set(t, WDWUtil.ran2fuc((String) param.get(field.getName())));
                     }
                 } catch (Exception e) {
