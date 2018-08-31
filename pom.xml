@@ -8,7 +8,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>core</name>
+	<name>candidate-management</name>
 	<description>系统主体服务</description>
 
 	<modules>
