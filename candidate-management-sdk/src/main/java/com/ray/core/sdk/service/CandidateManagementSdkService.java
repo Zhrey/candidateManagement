@@ -46,6 +46,6 @@ public interface CandidateManagementSdkService {
      * @date: Created in 11:33 2018/8/16
      */
     @RequestMapping(value = "resume/uploadFile")
-    ResultDTO uploadFile(@RequestParam("fileModel") File file);
+    ResultDTO uploadFile(@RequestParam("fileModel") File file,@RequestParam("fileName") String fileName);
 
 }

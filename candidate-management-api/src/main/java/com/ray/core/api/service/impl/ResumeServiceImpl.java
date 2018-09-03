@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -51,12 +52,8 @@ public class ResumeServiceImpl implements ResumeService {
     private DTrainExperienceService dTrainExperienceService;
     @Autowired
     private DPersonOtherService dPersonOtherService;
-
-    public ResultDTO downloadFile(String filePath, String fileName){
-
-        return fileSdkService.downloadFile(filePath,fileName);
-    }
-
+    @Autowired
+    private DPersonFileService dPersonFileService;
 
     /**
      * @Author: ZhangRui
@@ -81,18 +78,31 @@ public class ResumeServiceImpl implements ResumeService {
             List<SearchResumeResultDTO> list = new ArrayList<>();
             //循环人员匹配合同信息
             for(DPersonBase dPersonBase : resultDTO.getData().getRows()){
-
+                SearchResumeResultDTO searchResumeResultDTO = null;
                 DResumeExample dResumeExample = new DResumeExample();
                 dResumeExample.createCriteria().andDataFlagEqualTo(0)
                         .andPersonIdEqualTo(dPersonBase.getId());
                 ResultDTO<List<DResume>> resumeResultDTO = dResumeService.selectByExample(dResumeExample);
                 if (resumeResultDTO.isSuccess()) {
-                    SearchResumeResultDTO searchResumeResultDTO = resumeConvertor.toDTO(resumeResultDTO.getData().get(0));
+                    searchResumeResultDTO = resumeConvertor.toDTO(resumeResultDTO.getData().get(0));
                     resumeConvertor.personInfoToDTO(searchResumeResultDTO,dPersonBase);
                     list.add(searchResumeResultDTO);
 
                 }else{
                     log.error("查询简历基本信息失败，数据："+ resumeResultDTO.getData());
+                }
+
+                if (null != searchResumeResultDTO) {
+
+                    DPersonFileExample dPersonFileExample = new DPersonFileExample();
+                    dPersonFileExample.createCriteria().andDataFlagEqualTo(0)
+                            .andPersonIdEqualTo(dPersonBase.getId());
+                    ResultDTO<List<DPersonFile>> fileResultDTO = dPersonFileService.selectByExample(dPersonFileExample);
+                    if (fileResultDTO.isSuccess()) {
+                        resumeConvertor.personFileToDTO(searchResumeResultDTO,fileResultDTO.getData().get(0));
+                    }else{
+                        log.error("查询简历基本信息失败，数据："+ resumeResultDTO.getData());
+                    }
                 }
             }
             return ResultDTO.success(PageResultDTO.rows(resultDTO.getData().getTotal(), list));
@@ -110,7 +120,7 @@ public class ResumeServiceImpl implements ResumeService {
      * @date: Created in 11:33 2018/8/16
      */
     @Transactional(rollbackFor = Exception.class)
-    public ResultDTO uploadFile(File file) {
+    public ResultDTO uploadFile(File file,String fileName) {
 
 
         if (!file.exists()) {
@@ -170,7 +180,26 @@ public class ResumeServiceImpl implements ResumeService {
             //保存人员基本信息出错
             return baseRes;
         }
-//        ResultDTO resultDTO = fileSdkService.uploadFile(file);
+        try {
+            ResultDTO resultDTO = fileSdkService.uploadFile(file);
+            if (resultDTO == null || !resultDTO.isSuccess()) {
+                return ResultDTO.failure(ResultError.error("服务器上传附件错误！请联系管理员！"));
+            } else {
+                DPersonFile dPersonFile = new DPersonFile();
+                Map<String, String> fileResult = (Map<String, String>)resultDTO.getData();
+                dPersonFile.setFileName(fileName);
+                dPersonFile.setFilePath(fileResult.get("url"));
+                dPersonFile.setPersonId((String) baseRes.getData());
+                ResultDTO insert = dPersonFileService.insertSelective(dPersonFile);
+                if (insert == null || !insert.isSuccess()) {
+                    return ResultDTO.failure(ResultError.error("附件上传返回内容处理失败！请联系管理员！"));
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ResultDTO.failure(ResultError.error("服务器上传附件错误！请联系管理员！"));
+        }
         return ResultDTO.success();
     }
 

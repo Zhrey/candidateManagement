@@ -3,6 +3,8 @@ package com.ray.core.sdk.dto;
 import com.ray.cloud.framework.base.dto.AbstractDTO;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Author: ZhangRui
  * @Description:
@@ -35,4 +37,6 @@ public class SearchResumeResultDTO extends AbstractDTO{
     private String expectSalary;
     //投递(收藏)时间
     private String deliveryDate;
+    /************************简历附件信息*************************/
+    List<FileBaseDTO> files;
 }

@@ -2,6 +2,7 @@ package com.ray.core.api.controller;
 
 import com.ray.cloud.framework.base.dto.PageResultDTO;
 import com.ray.cloud.framework.base.dto.ResultDTO;
+import com.ray.cloud.framework.file.sdk.service.FileSdkService;
 import com.ray.core.api.service.ResumeService;
 import com.ray.core.sdk.dto.SearchResumeDTO;
 import com.ray.core.sdk.dto.SearchResumeResultDTO;
@@ -21,6 +22,8 @@ public class ResumeController {
 
     @Autowired
     private ResumeService resumeService;
+    @Autowired
+    private FileSdkService fileSdkService;
 
     /**
      * @Author: ZhangRui
@@ -29,17 +32,10 @@ public class ResumeController {
      * @date: Created in 11:33 2018/8/16
      */
     @RequestMapping("uploadFile")
-    public ResultDTO uploadFile(@RequestParam("fileModel") File file) {
+    public ResultDTO uploadFile(@RequestParam("fileModel") File file,@RequestParam String fileName) {
 
-        return resumeService.uploadFile(file);
+        return resumeService.uploadFile(file,fileName);
     }
-
-    @RequestMapping("downloadFile")
-    public ResultDTO downloadFile(@RequestParam String filePath, String fileName) {
-
-        return resumeService.downloadFile(filePath,fileName);
-    }
-
 
     /**
      * @Author: ZhangRui

@@ -12,9 +12,7 @@ import java.io.File;
  */
 public interface ResumeService {
 
-    ResultDTO uploadFile(File file);
-
-    ResultDTO downloadFile(String filePath, String fileName);
+    ResultDTO uploadFile(File file,String fileName);
 
     /**
      * @Author: ZhangRui
