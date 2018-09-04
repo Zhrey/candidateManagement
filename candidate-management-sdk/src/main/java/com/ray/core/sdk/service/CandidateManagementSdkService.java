@@ -41,6 +41,15 @@ public interface CandidateManagementSdkService {
 
     /**
      * @Author: ZhangRui
+     * @param: searchSituationDTO
+     * @Description: 查询候选人沟通信息列表
+     * @date: Created in 11:33 2018/8/16
+     */
+    @RequestMapping(value = "task/searchSituation")
+    ResultDTO<PageResultDTO<SearchSituationResultDTO>> searchSituation(SearchSituationDTO searchSituationDTO);
+
+    /**
+     * @Author: ZhangRui
      * @param: searchResumeDTO
      * @Description: 查询简历基本信息
      * @date: Created in 11:33 2018/8/16
