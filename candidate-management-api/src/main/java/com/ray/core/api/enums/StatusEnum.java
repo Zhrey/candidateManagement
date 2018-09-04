@@ -12,9 +12,9 @@ import lombok.Getter;
 public enum StatusEnum {
 
     NO_CANTACT("未沟通",0),
-    CANTACTING("沟通中",1),
-    FIRST_INTERVIEW("初面",2),
-    SECOND_INTERVIEW("终面",3),
+    CANTACTING("沟通情况",1),
+    FIRST_INTERVIEW("初面结果",2),
+    SECOND_INTERVIEW("终面结果",3),
     GIVE_UP("放弃",4),
     ENTRY("入职",5),
     QUIT("离职",6);
