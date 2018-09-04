@@ -54,6 +54,10 @@ public class ResumeServiceImpl implements ResumeService {
     private DPersonOtherService dPersonOtherService;
     @Autowired
     private DPersonFileService dPersonFileService;
+    @Autowired
+    private DPersonProcessService dPersonProcessService;
+    @Autowired
+    private DPersonSituationService dPersonSituationService;
 
     /**
      * @Author: ZhangRui
@@ -450,11 +454,16 @@ public class ResumeServiceImpl implements ResumeService {
             return ResultDTO.failure(ResultError.error("上传错误，该候选人已经上传过简历！"));
         } else {
             ResultDTO<String> resultDTO = dPersonBaseService.insertSelective(dPersonBase);
-            if (resultDTO.isSuccess()) {
+            DPersonProcess dPersonProcess = new DPersonProcess();
+            dPersonProcess.setPersonId(dPersonBase.getId());
+            dPersonProcess.setStatus(StatusEnum.NO_CANTACT.getValue());
+            ResultDTO<String> processResult = dPersonProcessService.insertSelective(dPersonProcess);
+            if (resultDTO.isSuccess() && processResult.isSuccess()) {
                 return resultDTO;
             }else {
                 return ResultDTO.failure(ResultError.error("请联系管理员，简历信息入库失败！"));
             }
+
         }
 
     }

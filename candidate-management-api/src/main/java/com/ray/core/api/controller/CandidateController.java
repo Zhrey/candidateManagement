@@ -23,7 +23,7 @@ public class CandidateController {
 
     /**
      * @Author: ZhangRui
-     * @param: multipartFile
+     * @param: searchCandidateDTO
      * @Description: 查询候选人基本信息
      * @date: Created in 11:33 2018/8/16
      */
